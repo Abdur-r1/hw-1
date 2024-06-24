@@ -1,90 +1,449 @@
-<DOCTYPE!>
-<html>
-    <head> <h1>India PM Modi's government defeats no-confidence motion</h1></head>
-    <body>
-        
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/QYYPOm5Zl4s" ></iframe>
-<p>
-        <h3>
-            In this screen grab India's Prime Minister Narendra Modi (R) is seen on a television screen as he addresses the lower house <br>Lok Sabha in New Delhi on August 10, 2023, in response to the Opposition's no-confidence motion against the NDA government
-        </h3>
-        
-            <hr>
-        
-        <p>
-            <i>
-                <u>
-                    The government of Indian prime minister Narendra Modi defeated a no-confidence motion in parliament on Thursday after a fiery speech by the premier at the climax of a three-day debate.
-                </u>
-            </i>
-        </p>
-    </p>
-    <p>
-        <b>
-            <mark>
-                Opposition lawmakers -- who had brought the motion over months of ethnic violence in Manipur state -- walked out of the chamber, prompting a furious rebuke from the premier, with the government then winning the vote.  
-            </mark>
-        </b>
-    </p>
-    <p>
-        The walkouts, according to broadcasters, included Congress party leader Rahul Gandhi, who on Wednesday said Modi's government was "set on burning the whole country".
+6#include <iostream>
+#include <vector>
+#include <cctype>
+#include <cstdlib>
 
-Modi denounced them, saying: "Those who don't trust democracy are always ready to make a comment but don't have the patience to hear (the rebuttal)."
+using namespace std;
 
-They would "speak ill and run away, throw garbage and run away, spread lies and run away", he added, to cheers from his own benches.
+struct Symbol {
+    char symbol;
+    void* address;
+};
 
-"This is their game and the country can't expect much from them."
+int main() {
+    vector<Symbol> symbols;
+    string expression;
+    char ch;
 
-The no-confidence vote was dismissed by the government ahead of the vote as a headline-grabbing gimmick ahead of a general election next year.
+    cout << "Expression terminated by $: ";
+    // Read input until '$' is encountered
+    while (cin.get(ch) && ch != '$') {
+        expression.push_back(ch);
+    }
 
-Modi's Hindu-nationalist Bharatiya Janata Party (BJP) has a large majority in the 543-member lower house, and is widely expected to win a third term in power.
+    cout << "Given expression: " << expression << endl;
 
-Its muscular appeals to India's Hindu majority have proven a winning formula, and Modi has already steered it to two landslide victories over Gandhi and his Congress party.
+    cout << "Symbol table\n";
+    cout << "Symbol\tAddr\t\tType\n";
 
-"I can understand the Congress party's problem," Modi said Thursday. "They have been launching the same failed product again and again, but the launch fails every time."
-  <br>
- <h3>
-    <u>
-        <u>
-            'Peace in Manipur'
-        </u>
-    </u>
- </h3>
-</h6> 
-</p>
-<p>
-   <b>
-    <sup>
-      <mark>
-        Gandhi, 53, is the son, grandson and great-grandson of three former Indian premiers.
-      </mark>
-    </sup>
-   </b>
+    // Process the expression to fill the symbol table
+    for (char c : expression) {
+        if (isalpha(c)) {  // Check if the character is an alphabet
+            Symbol sym;
+            sym.symbol = c;
+            sym.address = malloc(sizeof(char));  // Allocate memory for the symbol
+            symbols.push_back(sym);
+            cout << c << "\t" << sym.address << "\tidentifier" << endl;
+        }
+    }
 
-He spearheaded the parliamentary attack on the government Wednesday, condemning what he said was Modi's inaction over the deadly Manipur violence.
+    cout << "Enter the symbol to be searched: ";
+    cin >> ch;  // Read the symbol to search for
 
-In a speech to lawmakers, Gandhi had charged that Modi was "killing Mother India".
+    bool found = false;
+    for (const auto& sym : symbols) {
+        if (sym.symbol == ch) {
+            cout << "Symbol found\n";
+            cout << sym.symbol << " @ address " << sym.address << endl;
+            found = true;
+            break;
+        }
+    }
 
-The opposition leader was restored to parliament on Monday after the Supreme Court suspended his defamation conviction over past comments criticising Modi.
+    if (!found) {
+        cout << "Symbol not found\n";
+    }
 
-Gandhi had been sentenced to two years' <b>
-    <sub>
-        <del>
-            mprisonment in March in a case that critics flagged as an effort to stifle political opposition in the world's largest democracy.
-        </del>
-    </sub>
-</b>
+    // Free allocated memory
+    for (const auto& sym : symbols) {
+        free(sym.address);
+    }
 
-</p>
+    return 0;
+}
+7#include <iostream>
+#include <vector>
+#include <cctype>
+#include <cstring>
+
+using namespace std;
+
+int nop;
+vector<string> production;
+
+void result(string &res, char val) {
+    if (res.find(val) == string::npos) {
+        res.push_back(val);
+    }
+}
+
+void FIRST(string &res, char c) {
+    string subres;
+    res.clear();
+
+    if (!isupper(c)) {
+        result(res, c);
+        return;
+    }
+
+    for (int i = 0; i < nop; ++i) {
+        if (production[i][0] == c) {
+            if (production[i][2] == '$') {
+                result(res, '$');
+            } else {
+                int j = 2;
+                while (production[i][j] != '\0') {
+                    bool eps = false;
+                    FIRST(subres, production[i][j]);
+                    for (char k : subres) {
+                        result(res, k);
+                    }
+                    if (subres.find('$') != string::npos) {
+                        eps = true;
+                    }
+                    if (!eps) break;
+                    ++j;
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    char choice;
+    char c;
+    string res1;
+
+    cout << "Number of production rules: ";
+    cin >> nop;
+    production.resize(nop);
+
+    for (int i = 0; i < nop; ++i) {
+        cout << "Enter production Number " << i + 1 << ": ";
+        cin >> production[i];
+    }
+
+    do {
+        cout << "\nFind the FIRST of: ";
+        cin >> c;
+        FIRST(res1, c);
+        cout << "\nFIRST(" << c << ")= { ";
+        for (char ch : res1) {
+            cout << ch << " ";
+        }
+        cout << "}\n";
+        cout << "Press 'y' to continue: ";
+        cin >> choice;
+    } while (choice == 'y' || choice == 'Y');
+
+    return 0;
+}
+
+8#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int nop, m = 0, p, i = 0, j = 0;
+char prod[10][10], res[10];
+
+void FOLLOW(char c);
+void first(char c);
+void result(char c);
+
+int main() {
+    int choice;
+    char c, ch;
+
+    printf("Enter the no. of production rules: ");
+    scanf("%d", &nop);
+
+    for (i = 0; i < nop; i++) {
+        printf("Enter production Number %d: ", i + 1);
+        scanf("%s", prod[i]);
+    }
+
+    do {
+        m = 0;
+        printf("Find FOLLOW of --> ");
+        scanf(" %c", &c);
+        FOLLOW(c);
+        printf("FOLLOW(%c) = {", c);
+        for (i = 0; i < m; i++) {
+            printf("%c ", res[i]);
+        }
+        printf("}\n");
+        printf("Press 1 to continue: ");
+        scanf("%d%c", &choice, &ch);
+    } while (choice == 1);
+
+    return 0;
+}
+
+void FOLLOW(char c) {
+    if (prod[0][0] == c) {
+        result('$');
+    }
+    for (i = 0; i < nop; i++) {
+        for (j = 2; j < strlen(prod[i]); j++) {
+            if (prod[i][j] == c) {
+                if (prod[i][j + 1] != '\0') {
+                    first(prod[i][j + 1]);
+                }
+                if (prod[i][j + 1] == '\0' && c != prod[i][0]) {
+                    FOLLOW(prod[i][0]);
+                }
+            }
+        }
+    }
+}
+
+void first(char c) {
+    int k;
+    if (!isupper(c)) {
+        result(c);
+        return;
+    }
+    for (k = 0; k < nop; k++) {
+        if (prod[k][0] == c) {
+            if (prod[k][2] == '$') {
+                FOLLOW(prod[i][0]);
+            } else if (islower(prod[k][2])) {
+                result(prod[k][2]);
+            } else {
+                first(prod[k][2]);
+            }
+        }
+    }
+}
+
+void result(char c) {
+    for (int i = 0; i < m; i++) {
+        if (res[i] == c) {
+            return;
+        }
+    }
+    res[m++] = c;
+}
 
 
-<address>
-    <pre><h3><b>
-        Local & state government offices
-        Sansad Marg, Janpath, Connaught Place, New Delhi, Delhi 110002
-        +91 88959 60957
-           </b>
-       </h3>
-       </pre>
-</address></body>
-</html>
+9#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+
+char a[10];
+int top = -1;
+
+void error() {
+    printf("Syntax Error\n");
+}
+
+void push(char k[]) {
+    for (int i = 0; k[i] != '\0'; i++) {
+        if (top < 9) {
+            a[++top] = k[i];
+        }
+    }
+}
+
+char TOS() {
+    return a[top];
+}
+
+void pop() {
+    if (top >= 0) {
+        a[top--] = '\0';
+    }
+}
+
+void display() {
+    for (int i = 0; i <= top; i++) {
+        printf("%c", a[i]);
+    }
+}
+
+void display1(char p[], int m) {
+    int l;
+    printf("\t");
+    for (l = m; p[l] != '\0'; l++) {
+        printf("%c", p[l]);
+    }
+}
+
+char* stack() {
+    return a;
+}
+
+int main() {
+    char ip[20], r[20], nt, cin;
+    int ir, ic, j = 0;
+
+    char t[5][6][10] = {
+        {"$", "$", "TH", "$", "TH", "$"},
+        {"+TH", "$", "$", "e", "$", "e"},
+        {"$", "$", "FU", "$", "FU", "$"},
+        {"e", "*FU", "$", "e", "$", "e"},
+        {"$", "$", "(E)", "$", "i", "$"}
+    };
+
+    printf("\nEnter a String (add $ at the end): ");
+    gets(ip);
+    printf("Stack\tInput\tOutput\n\n");
+    push("$E");
+    display();
+    printf("\t%s\n", ip);
+
+    for (j = 0; ip[j] != '\0';) {
+        cin = ip[j];
+        nt = TOS();
+
+        if (nt == cin) {
+            pop();
+            display();
+            display1(ip, j + 1);
+            printf("\tPOP\n");
+            j++;
+            continue;
+        }
+
+        if (nt == 'E') ir = 0;
+        else if (nt == 'H') ir = 1;
+        else if (nt == 'T') ir = 2;
+        else if (nt == 'U') ir = 3;
+        else if (nt == 'F') ir = 4;
+        else {
+            error();
+            break;
+        }
+
+        if (cin == '+') ic = 0;
+        else if (cin == '*') ic = 1;
+        else if (cin == '(') ic = 2;
+        else if (cin == ')') ic = 3;
+        else if (isalpha(cin)) {
+            ic = 4;
+            cin = 'i';
+        } else if (cin == '$') ic = 5;
+        else {
+            error();
+            break;
+        }
+
+        if (strcmp(t[ir][ic], "$") == 0) {
+            error();
+            break;
+        }
+
+        strcpy(r, t[ir][ic]);
+        strrev(r);
+
+        pop();
+        push(r);
+
+        if (TOS() == 'e') {
+            pop();
+        }
+
+        display();
+        display1(ip, j);
+        printf("\t%c->%s\n", nt, t[ir][ic]);
+
+        if (TOS() == '$' && cin == '$') break;
+
+        if (TOS() == '$') {
+            error();
+            break;
+        }
+    }
+
+    if (strcmp(stack(), "$") == 0) {
+        printf("\nGiven String is accepted\n");
+    } else {
+        printf("\nGiven String is not accepted\n");
+    }
+
+    return 0;
+}
+10#include <stdio.h>
+#include <string.h>
+
+char prol[7][10] = {"S", "A", "A", "B", "B", "C", "C"};
+char pror[7][10] = {"A", "Bb", "Cd", "aB", "@", "Cc", "@"};
+char prod[7][10] = {"S->A", "A->Bb", "A->Cd", "B->aB", "B->@", "C->Cc", "C->@"};
+char first[7][10] = {"abcd", "ab", "cd", "a@", "@", "c@", "@"};
+char follow[7][10] = {"$", "$", "$", "a$", "b$", "c$", "d$"};
+char table[5][6][10];
+
+int numr(char c) {
+    switch (c) {
+        case 'S': return 0;
+        case 'A': return 1;
+        case 'B': return 2;
+        case 'C': return 3;
+        case 'a': return 0;
+        case 'b': return 1;
+        case 'c': return 2;
+        case 'd': return 3;
+        case '$': return 4;
+        default: return -1;
+    }
+}
+
+int main() {
+    int i, j, k;
+
+    // Initialize the parsing table with empty strings
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 6; j++) {
+            strcpy(table[i][j], " ");
+        }
+    }
+
+    // Print the grammar
+    printf("\nThe grammar is:\n");
+    for (i = 0; i < 7; i++) {
+        printf("%s\n", prod[i]);
+    }
+
+    // Construct the predictive parsing table
+    for (i = 0; i < 7; i++) {
+        k = strlen(first[i]);
+        for (j = 0; j < k; j++) {
+            if (first[i][j] != '@') {
+                strcpy(table[numr(prol[i][0]) + 1][numr(first[i][j]) + 1], prod[i]);
+            }
+        }
+    }
+
+    for (i = 0; i < 7; i++) {
+        if (strlen(pror[i]) == 1 && pror[i][0] == '@') {
+            k = strlen(follow[i]);
+            for (j = 0; j < k; j++) {
+                strcpy(table[numr(prol[i][0]) + 1][numr(follow[i][j]) + 1], prod[i]);
+            }
+        }
+    }
+
+    // Fill table headers
+    strcpy(table[0][0], " ");
+    strcpy(table[0][1], "a");
+    strcpy(table[0][2], "b");
+    strcpy(table[0][3], "c");
+    strcpy(table[0][4], "d");
+    strcpy(table[0][5], "$");
+    strcpy(table[1][0], "S");
+    strcpy(table[2][0], "A");
+    strcpy(table[3][0], "B");
+    strcpy(table[4][0], "C");
+
+    // Print the predictive parsing table
+    printf("\nPredictive Parsing Table:\n\n");
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 6; j++) {
+            printf("%-10s", table[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
+
